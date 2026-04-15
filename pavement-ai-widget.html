@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pavement AI Widget Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#fff;color:#222}
+button{cursor:pointer;font-family:'DM Sans',sans-serif}
+input{outline:none;font-family:'DM Sans',sans-serif}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Contractor site ── */
+nav{padding:16px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;background:#fff;position:sticky;top:0;z-index:10}
+.nav-logo{font-size:18px;font-weight:700}
+.nav-links{display:flex;align-items:center;gap:24px}
+.nav-link{font-size:14px;color:#555;cursor:pointer}
+.nav-cta{background:linear-gradient(135deg,#fb9c0f,#e06800);color:#fff;padding:8px 18px;border-radius:8px;font-weight:600;border:none}
+.hero{height:400px;background:#1a1a1a;position:relative;display:flex;align-items:center;overflow:hidden}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.7) 0%,rgba(251,156,15,.15) 100%)}
+.hero-content{position:relative;padding:0 48px;z-index:1}
+.hero-tag{font-size:13px;color:#fb9c0f;font-weight:600;margin-bottom:12px}
+.hero-title{font-size:38px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:10px;max-width:500px}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.7);margin-bottom:24px}
+.hero-btns{display:flex;gap:12px}
+.btn-primary{background:linear-gradient(135deg,#fb9c0f,#e06800);color:#fff;border:none;padding:12px 24px;border-radius:9px;font-weight:600;font-size:14px}
+.btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);padding:12px 24px;border-radius:9px;font-weight:500;font-size:14px}
+.section{padding:60px 32px;max-width:960px;margin:0 auto}
+.section-title{font-size:26px;font-weight:700;margin-bottom:28px;text-align:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px}
+.card{background:#f9f9f9;border:1px solid #eee;border-radius:12px;padding:22px 18px}
+.card-icon{font-size:28px;margin-bottom:10px}
+.card-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.card-desc{font-size:13px;color:#666;line-height:1.6}
+.cta-strip{background:#1a1a1a;padding:40px 32px;display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap}
+.cta-text{color:rgba(255,255,255,.85);font-size:16px}
+footer{text-align:center;padding:24px;font-size:12px;color:#aaa;border-top:1px solid #eee}
+
+/* ── Chat widget ── */
+#widget-root{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
+#bubble{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#fb9c0f,#e06800);border:none;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 6px 24px rgba(251,156,15,.5);position:relative}
+#badge{position:absolute;top:0;right:0;width:19px;height:19px;border-radius:50%;background:#ef4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+.panel{width:340px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;display:flex;flex-direction:column;max-height:80vh;animation:slideUp .2s ease}
+.panel-head{padding:12px 14px;background:linear-gradient(135deg,#fb9c0f,#e06800);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.head-logo{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;flex-shrink:0}
+.head-name{color:#fff;font-weight:700;font-size:13px}
+.head-status{color:rgba(255,255,255,.75);font-size:10px;display:flex;align-items:center;gap:4px;margin-top:1px}
+.green-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 5px #4ade80;display:inline-block}
+.head-icon-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:26px;height:26px;border-radius:6px;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;background:#f7f7f7}
+.msg-row{display:flex;align-items:flex-end;gap:7px}
+.msg-row.user{justify-content:flex-end}
+.av{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#fb9c0f,#e06800);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:#fff}
+.ai-bubble{background:#fff;border:1px solid #e8e8e8;border-radius:12px 12px 12px 3px;padding:10px 12px;color:#222;font-size:13px;line-height:1.65;max-width:83%;white-space:pre-wrap;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.user-bubble{background:linear-gradient(135deg,#fb9c0f,#e06800);border-radius:12px 12px 3px 12px;padding:10px 12px;color:#fff;font-size:13px;line-height:1.65;max-width:78%;font-weight:500}
+.book-btn{background:linear-gradient(135deg,#fb9c0f,#e06800);border:none;border-radius:9px;padding:9px 14px;color:#fff;font-size:12.5px;font-weight:700;box-shadow:0 3px 10px rgba(251,156,15,.35);margin-top:7px;margin-left:34px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{background:#fff;border:1px solid #fb9c0f;border-radius:20px;padding:5px 11px;color:#fb9c0f;font-size:11.5px;font-weight:600}
+.input-row{padding:9px 10px;border-top:1px solid #eee;display:flex;gap:7px;align-items:center;background:#fff;flex-shrink:0}
+.cal-icon{background:#f4f4f4;border:1px solid #e8e8e8;border-radius:8px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.chat-input{flex:1;background:#f4f4f4;border:1px solid #e0e0e0;border-radius:9px;padding:8px 11px;font-size:13px;color:#222}
+.send-btn{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#fb9c0f,#e06800);border:none;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:disabled{opacity:.35;cursor:not-allowed}
+.w-footer{text-align:center;font-size:10px;color:#bbb;padding:5px;background:#fff;border-top:1px solid #f0f0f0;flex-shrink:0}
+
+/* Calendly panel */
+.cal-panel{width:340px;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;display:flex;flex-direction:column;animation:slideUp .2s ease}
+.cal-head{padding:13px 15px;background:linear-gradient(135deg,#fb9c0f,#e06800);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cal-head-text{color:#fff;font-weight:700;font-size:13px}
+.cal-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;background:#f9f9f9}
+.cal-spinner{width:28px;height:28px;border-radius:50%;border:3px solid #f0f0f0;border-top-color:#fb9c0f;animation:spin .8s linear infinite}
+.cal-loading-text{font-size:12px;color:#999}
+.cal-iframe{width:100%;height:500px;border:none;background:#f9f9f9}
+.cal-footer{text-align:center;font-size:10px;color:#bbb;padding:7px;background:#f9f9f9;border-top:1px solid #eee;flex-shrink:0}
+
+.dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:#fb9c0f;margin:0 2px;animation:blink 1.4s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+</style>
+</head>
+<body>
+
+<!-- Contractor site -->
+<nav>
+  <div class="nav-logo">🏗️ ABC Paving Co.</div>
+  <div class="nav-links">
+    <span class="nav-link">Services</span>
+    <span class="nav-link">About</span>
+    <span class="nav-link">Gallery</span>
+    <button class="nav-cta">Free Quote</button>
+  </div>
+</nav>
+<div class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-tag">⭐ Serving the area since 1998</div>
+    <h1 class="hero-title">Professional Asphalt & Concrete Paving</h1>
+    <p class="hero-sub">Driveways · Parking Lots · Repairs · Seal Coating</p>
+    <div class="hero-btns">
+      <button class="btn-primary">Get Free Estimate</button>
+      <button class="btn-ghost">View Our Work</button>
+    </div>
+  </div>
+</div>
+<div class="section">
+  <h2 class="section-title">Our Services</h2>
+  <div class="cards">
+    <div class="card"><div class="card-icon">🛣️</div><div class="card-title">Asphalt Paving</div><div class="card-desc">New driveways, parking lots, overlays and full replacements.</div></div>
+    <div class="card"><div class="card-icon">🧱</div><div class="card-title">Concrete Work</div><div class="card-desc">Driveways, sidewalks, patios, stamped & decorative concrete.</div></div>
+    <div class="card"><div class="card-icon">🔧</div><div class="card-title">Repairs & Patching</div><div class="card-desc">Crack filling, pothole repair, and section replacements.</div></div>
+    <div class="card"><div class="card-icon">✨</div><div class="card-title">Seal Coating</div><div class="card-desc">Protect and extend the life of your asphalt pavement.</div></div>
+  </div>
+</div>
+<div class="cta-strip">
+  <div class="cta-text">Ready to get started? We offer <strong>free estimates</strong> with no obligation.</div>
+  <button class="btn-primary">Call Us Today</button>
+</div>
+<footer>© 2026 ABC Paving Co. · All Rights Reserved</footer>
+
+<!-- Widget -->
+<div id="widget-root">
+  <div id="panel-container"></div>
+  <button id="bubble" onclick="toggleWidget()">
+    <span id="bubble-icon">⬡</span>
+    <span id="badge">1</span>
+  </button>
+</div>
+
+<script>
+// ── CONFIG ──
+const COMPANY_NAME = "ABC Paving Co.";
+const CALENDLY_URL = "https://calendly.com/abcpaving/free-estimate";
+
+// ── State ──
+let widgetOpen = false;
+let calOpen = false;
+let msgCount = 0;
+const SUGGESTIONS = ["How much does a driveway cost?","Asphalt vs concrete?","Book a free estimate"];
+
+const KB = [
+  {keys:["how long","last","lifespan","life span","years"],answer:`Asphalt typically lasts 20–30 years with proper maintenance:\n\n• Seal coat every 3–5 years\n• Fill cracks before winter\n• Avoid heavy vehicles on edges\n\nWant to book a free estimate? I can open our calendar right now!`,showCal:true},
+  {keys:["asphalt vs concrete","concrete vs asphalt","which is better","difference"],answer:`Asphalt — Lower cost ($3–7/sq ft), easier repairs, better in cold climates. Needs sealing every few years.\n\nConcrete — Lasts longer (30–50 yrs), less maintenance, higher upfront ($6–12/sq ft).\n\nNot sure which is right for you? Book a free on-site consultation!`,showCal:true},
+  {keys:["cost","price","how much","per square","sq ft","sqft","charge","pricing"],answer:`Typical price ranges:\n\nAsphalt\n• Driveway: $3–$7/sq ft\n• Parking lot: $2–$5/sq ft\n• Seal coat: $0.15–$0.25/sq ft\n\nConcrete\n• Driveway: $6–$12/sq ft\n• Stamped: $12–$25/sq ft\n\nGet an exact price with a free on-site estimate!`,showCal:true},
+  {keys:["drive on","walk on","ready","cure","dry","when can"],answer:`New Asphalt\n• Walk on: 24 hours\n• Drive on: 48–72 hours\n• Heavy vehicles: 2 weeks\n\nNew Concrete\n• Walk on: 24–48 hours\n• Drive on: 7 days\n• Full strength: 28 days`,showCal:false},
+  {keys:["seal","sealcoat","seal coat","sealing","how often"],answer:`Seal coat your asphalt every 3–5 years. First seal: wait 6–12 months after new install.\n\nProtects against UV, oil spills, and water — can double pavement life!`,showCal:true},
+  {keys:["crack","pothole","repair","fix","patch"],answer:`Fix cracks ASAP — small problems become costly fast.\n\n• Hairline cracks: $1–3/linear ft\n• Potholes: $100–$400 each\n• Alligator cracking: section replacement needed\n\nBook a free assessment — we'll tell you exactly what's needed!`,showCal:true},
+  {keys:["parking lot","commercial","business"],answer:`Parking lots are our specialty!\n\n• New lot: $2–$5/sq ft\n• Seal coat + restripe: $0.40–$0.60/sq ft\n• ADA compliant striping included\n\nSchedule a free commercial site assessment!`,showCal:true},
+  {keys:["driveway","home","house","residential"],answer:`A new driveway is one of the best curb appeal investments!\n\nTypical 2-car driveway (400–600 sq ft):\n• Asphalt: $1,500–$4,000\n• Concrete: $3,000–$7,500\n• Timeline: 1–2 days\n\nWant an exact price? Book a free estimate!`,showCal:true},
+  {keys:["winter","cold","freeze","snow","ice","salt"],answer:`Winter tips:\n\n• Use sand over rock salt (damages pavement)\n• Fill cracks before winter — water expands when frozen\n• Raise plow blade slightly to avoid gouging\n\nBest paving season: Spring through early fall (above 50°F).`,showCal:false},
+  {keys:["stamped","decorative","colored","pattern"],answer:`Stamped concrete gives you the look of stone or brick at a fraction of the cost.\n\n• Patterns: cobblestone, slate, wood plank\n• Colors: hundreds of options\n• Price: $12–$25/sq ft\n\nBook a free consultation to see our portfolio!`,showCal:true},
+  {keys:["free estimate","free quote","contact","call","schedule","appointment","book","estimate","calendar"],answer:`Absolutely! Pick any open time on our calendar and we'll come to you — completely free, no obligation.\n\nWe'll measure the job and give you an honest quote on the spot. 🙌`,showCal:true},
+];
+
+function getResponse(input){
+  const lower=input.toLowerCase();
+  for(const e of KB){if(e.keys.some(k=>lower.includes(k)))return e;}
+  return{answer:`Great question! For the most accurate info about your project, a free on-site assessment is the best next step.\n\nAsk about pricing, materials, repairs, timelines, or book a free estimate below!`,showCal:true};
+}
+
+// ── Render ──
+function renderPanel(){
+  const c=document.getElementById("panel-container");
+  if(!widgetOpen){c.innerHTML="";return;}
+  if(calOpen){renderCal(c);return;}
+  renderChat(c);
+}
+
+function renderChat(c){
+  c.innerHTML=`
+  <div class="panel" id="chat-panel">
+    <div class="panel-head">
+      <div class="head-logo">⬡</div>
+      <div style="flex:1">
+        <div class="head-name">${COMPANY_NAME}</div>
+        <div class="head-status"><span class="green-dot"></span> Online · Free estimates available</div>
+      </div>
+      <button class="head-icon-btn" onclick="openCal()" title="Book appointment" style="margin-right:4px">📅</button>
+      <button class="head-icon-btn" onclick="toggleWidget()">✕</button>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="input-row">
+      <button class="cal-icon" onclick="openCal()" title="Book">📅</button>
+      <input class="chat-input" id="chat-input" placeholder="Ask a question..." onkeydown="handleKey(event)" oninput="updateSend()"/>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()" disabled>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+    <div class="w-footer">Powered by Pavement AI</div>
+  </div>`;
+  // Restore messages
+  const msgs=document.getElementById("msgs");
+  chatMessages.forEach(m=>appendMsgEl(msgs,m.role,m.content,m.showCal,false));
+  if(chatMessages.length===1) appendChips(msgs);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function renderCal(c){
+  c.innerHTML=`
+  <div class="cal-panel">
+    <div class="cal-head">
+      <span class="cal-head-text">📅 Book Your Free Estimate</span>
+      <button class="head-icon-btn" onclick="closeCal()">✕</button>
+    </div>
+    <div class="cal-loading" id="cal-loading">
+      <div class="cal-spinner"></div>
+      <div class="cal-loading-text">Loading calendar...</div>
+    </div>
+    <iframe class="cal-iframe" id="cal-frame" style="display:none"
+      src="${CALENDLY_URL}?embed_type=inline&hide_landing_page_details=1&hide_gdpr_banner=1&background_color=ffffff&text_color=222222&primary_color=fb9c0f"
+      onload="iframeLoaded()" title="Book Free Estimate"></iframe>
+    <div class="cal-footer">🔒 Powered by Calendly · Goes straight to contractor's calendar</div>
+  </div>
+  <button id="bubble" onclick="toggleWidget()" style="width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#fb9c0f,#e06800);border:none;color:#fff;font-size:20px;box-shadow:0 6px 24px rgba(251,156,15,.5)">✕</button>`;
+}
+
+function iframeLoaded(){
+  const l=document.getElementById("cal-loading");
+  const f=document.getElementById("cal-frame");
+  if(l)l.style.display="none";
+  if(f)f.style.display="block";
+}
+
+// ── Messages ──
+let chatMessages=[
+  {role:"assistant",content:`Hi! 👋 I'm the AI assistant for ${COMPANY_NAME}.\n\nAsk me anything about asphalt, concrete, pricing, or repairs — or book a free estimate on our calendar!`,showCal:false}
+];
+
+function appendMsgEl(container,role,content,showCal,scroll){
+  const row=document.createElement("div");
+  row.className=`msg-row${role==="user"?" user":""}`;
+  if(role==="assistant"){
+    const av=document.createElement("div");av.className="av";av.textContent="⬡";row.appendChild(av);
+  }
+  const b=document.createElement("div");
+  b.className=role==="user"?"user-bubble":"ai-bubble";
+  b.textContent=content;
+  row.appendChild(b);
+  container.appendChild(row);
+  if(showCal&&role==="assistant"){
+    const btn=document.createElement("button");
+    btn.className="book-btn";
+    btn.textContent="📅 Book Free Estimate →";
+    btn.onclick=openCal;
+    container.appendChild(btn);
+  }
+  if(scroll)container.scrollTop=container.scrollHeight;
+}
+
+function appendChips(container){
+  const wrap=document.createElement("div");wrap.className="chips";wrap.id="chips";
+  SUGGESTIONS.forEach(q=>{
+    const btn=document.createElement("button");btn.className="chip";btn.textContent=q;
+    btn.onclick=()=>{document.getElementById("chips")?.remove();sendMsg(q);};
+    wrap.appendChild(btn);
+  });
+  container.appendChild(wrap);
+  container.scrollTop=container.scrollHeight;
+}
+
+function appendTyping(container){
+  const row=document.createElement("div");row.className="msg-row";row.id="typing";
+  const av=document.createElement("div");av.className="av";av.textContent="⬡";
+  const b=document.createElement("div");b.className="ai-bubble dots";b.innerHTML="<span></span><span></span><span></span>";
+  row.appendChild(av);row.appendChild(b);container.appendChild(row);
+  container.scrollTop=container.scrollHeight;
+}
+
+function sendMsg(text){
+  const input=document.getElementById("chat-input");
+  const t=text||input?.value?.trim();
+  if(!t)return;
+  if(input)input.value="";
+  updateSend();
+  document.getElementById("chips")?.remove();
+  chatMessages.push({role:"user",content:t,showCal:false});
+  const msgs=document.getElementById("msgs");
+  if(!msgs)return;
+  appendMsgEl(msgs,"user",t,false,true);
+  appendTyping(msgs);
+  setTimeout(()=>{
+    document.getElementById("typing")?.remove();
+    const res=getResponse(t);
+    chatMessages.push({role:"assistant",content:res.answer,showCal:res.showCal});
+    appendMsgEl(msgs,"assistant",res.answer,res.showCal,true);
+  },700+Math.random()*500);
+}
+
+function handleKey(e){if(e.key==="Enter")sendMsg();}
+function updateSend(){const i=document.getElementById("chat-input");const b=document.getElementById("send-btn");if(b)b.disabled=!i?.value?.trim();}
+
+// ── Controls ──
+function toggleWidget(){
+  widgetOpen=!widgetOpen;
+  calOpen=false;
+  document.getElementById("badge").style.display="none";
+  document.getElementById("bubble-icon").textContent=widgetOpen?"✕":"⬡";
+  document.getElementById("bubble").style.fontSize=widgetOpen?"20px":"24px";
+  renderPanel();
+  const existing=document.getElementById("bubble");
+  if(existing&&widgetOpen){existing.textContent="✕";existing.style.fontSize="20px";}
+}
+
+function openCal(){calOpen=true;renderPanel();}
+function closeCal(){calOpen=false;renderPanel();}
+
+// Init
+renderPanel();
+</script>
+</body>
+</html>

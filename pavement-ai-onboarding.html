@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pavement AI — Get Started</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d0d;font-family:'DM Sans',sans-serif;color:#e0e0e0;min-height:100vh}
+button{cursor:pointer;font-family:'DM Sans',sans-serif}
+input,select{outline:none;font-family:'DM Sans',sans-serif}
+input:focus,select:focus{border-color:#fb9c0f!important}
+button:disabled{opacity:.4;cursor:not-allowed}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+select option{background:#1a1a1a;color:#e0e0e0}
+
+/* Top bar */
+.topbar{padding:15px 32px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(13,13,13,.92);backdrop-filter:blur(12px);z-index:10}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,#fb9c0f,#e06800);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#fff}
+.step-pills{display:flex;gap:6px}
+.pill{width:28px;height:28px;border-radius:50%;background:#1e1e1e;border:1px solid #333;display:flex;align-items:center;justify-content:center;font-size:11px;color:#555;font-weight:700;transition:all .3s}
+.pill.active{background:rgba(251,156,15,.15);border-color:#fb9c0f;color:#fb9c0f}
+.pill.done{background:#fb9c0f;border-color:#fb9c0f;color:#fff}
+
+/* Layout */
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:1100px;margin:0 auto;padding:40px 24px;align-items:start;min-height:calc(100vh - 62px)}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.right{display:none}}
+
+/* Card */
+.card{background:#141414;border:1px solid #222;border-radius:16px;padding:36px 32px;animation:fadeUp .3s ease}
+.step-tag{font-size:10px;letter-spacing:2px;color:#fb9c0f;font-weight:600;margin-bottom:12px}
+.card-title{font-size:24px;font-weight:700;color:#fff;margin-bottom:8px;line-height:1.2}
+.card-sub{font-size:14px;color:#666;margin-bottom:28px;line-height:1.6}
+
+/* Fields */
+.fields{display:flex;flex-direction:column;gap:16px;margin-bottom:24px}
+.field-label{display:block;font-size:12px;color:#888;margin-bottom:6px;font-weight:500;letter-spacing:.3px}
+.field-input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;padding:11px 14px;color:#e0e0e0;font-size:14px;transition:border .2s}
+.field-select{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:9px;padding:11px 14px;color:#e0e0e0;font-size:14px;appearance:none}
+.color-row{display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap}
+.swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;transition:all .15s;border:3px solid transparent;flex-shrink:0}
+.swatch.selected{border-color:#fff;box-shadow:0 0 0 2px #fb9c0f}
+.color-input{width:28px;height:28px;border-radius:50%;border:none;padding:0;cursor:pointer;background:none}
+
+/* Buttons */
+.btn-primary{width:100%;background:linear-gradient(135deg,#fb9c0f,#e06800);color:#fff;border:none;border-radius:10px;padding:14px;font-weight:700;font-size:15px;box-shadow:0 6px 20px rgba(251,156,15,.3);transition:opacity .15s}
+.btn-ghost{background:transparent;color:#666;border:1px solid #2a2a2a;border-radius:10px;padding:13px 20px;font-weight:500;font-size:14px;transition:all .15s}
+.btn-row{display:flex;gap:10px}
+.legal{font-size:11px;color:#444;margin-top:14px;text-align:center;line-height:1.5}
+
+/* How-to box */
+.how-to{background:#1a1a1a;border:1px solid #252525;border-radius:10px;padding:16px 18px;margin-bottom:20px}
+.how-to-title{font-size:12px;color:#888;font-weight:600;margin-bottom:10px}
+.how-to-list{padding-left:16px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#666;line-height:1.5}
+.how-to-list strong{color:#aaa}
+.skip-note{font-size:12px;color:#555;margin-bottom:16px}
+.skip-btn{background:none;border:none;color:#fb9c0f;font-size:12px;cursor:pointer;text-decoration:underline;font-family:'DM Sans',sans-serif;padding:0}
+
+/* Code block */
+.code-block{background:#0a0a0a;border:1px solid #222;border-radius:10px;overflow:hidden;margin-bottom:20px}
+.code-header{padding:10px 16px;background:#141414;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;justify-content:space-between}
+.code-title{font-size:11px;color:#666;font-weight:600;letter-spacing:1px}
+.copy-btn{border:none;border-radius:6px;padding:5px 12px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;transition:background .2s}
+.code-pre{padding:16px;font-size:11px;color:#7ec8e3;font-family:monospace;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.platform-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px}
+.platform-card{background:#1a1a1a;border:1px solid #222;border-radius:9px;padding:10px 12px;display:flex;align-items:flex-start;gap:10px;font-size:12px}
+.platform-name{font-weight:700;color:#ccc;margin-bottom:2px}
+.platform-hint{font-size:10.5px;color:#555;line-height:1.4}
+
+/* Success */
+.success-icon{font-size:52px;margin-bottom:16px}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;text-align:left}
+.summary-item{background:#1a1a1a;border:1px solid #222;border-radius:9px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:13px;color:#aaa}
+.trial-box{background:rgba(251,156,15,.06);border:1px solid rgba(251,156,15,.2);border-radius:12px;padding:20px 24px}
+.trial-title{font-size:15px;color:#ccc;margin-bottom:4px}
+.trial-sub{font-size:12px;color:#666}
+
+/* Right side */
+.right{padding:0 0 0 24px;position:sticky;top:90px;display:flex;flex-direction:column;gap:20px}
+.preview-browser{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.browser-bar{padding:10px 14px;background:#111;border-bottom:1px solid #222;display:flex;align-items:center;gap:10px}
+.browser-dots{display:flex;gap:5px}
+.bdot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.browser-url{background:#1e1e1e;border-radius:5px;padding:4px 12px;font-size:10px;color:#555;flex:1}
+.browser-body{padding:16px;min-height:300px;position:relative}
+.fake-nav{background:#222;border-radius:6px;padding:8px 12px;font-size:11px;color:#555;margin-bottom:8px}
+.fake-hero{background:#252525;border-radius:6px;height:70px;margin-bottom:10px}
+.fake-lines{display:flex;flex-direction:column;gap:6px}
+.fake-line{background:#1e1e1e;height:7px;border-radius:4px}
+.preview-caption{text-align:center;font-size:11px;color:#444;margin-top:8px}
+
+/* Mini widget preview */
+.mini-widget{position:absolute;bottom:12px;right:12px}
+.mini-panel{width:220px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.4);margin-bottom:8px}
+.mini-head{padding:9px 11px;display:flex;align-items:center;gap:7px}
+.mini-logo{width:24px;height:24px;border-radius:6px;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0}
+.mini-name{color:#fff;font-weight:700;font-size:10px}
+.mini-status{color:rgba(255,255,255,.7);font-size:8px}
+.mini-body{padding:8px;background:#f8f8f8}
+.mini-msg{background:#fff;border:1px solid #eee;border-radius:8px 8px 8px 2px;padding:7px 9px;font-size:10px;color:#333;line-height:1.5;margin-bottom:6px}
+.mini-book{border:none;border-radius:6px;padding:6px 9px;color:#fff;font-weight:700;font-size:9.5px;width:100%}
+.mini-bubble{width:40px;height:40px;border-radius:50%;border:none;color:#fff;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;margin-left:auto}
+
+/* Sidebar progress */
+.sidebar{background:#141414;border:1px solid #1e1e1e;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.side-step{display:flex;align-items:center;gap:10px;font-size:12px}
+.side-dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;transition:all .3s}
+</style>
+</head>
+<body>
+
+<div style="background:radial-gradient(ellipse 60% 50% at 70% 30%,rgba(251,156,15,.07) 0%,transparent 60%);position:fixed;inset:0;pointer-events:none"></div>
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">⬡</div>
+    <span class="logo-text">PAVEMENT AI</span>
+  </div>
+  <div class="step-pills" id="pills"></div>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+  <div style="padding-right:24px">
+    <div id="step-content"></div>
+  </div>
+  <div class="right">
+    <div>
+      <div class="preview-browser">
+        <div class="browser-bar">
+          <div class="browser-dots">
+            <span class="bdot" style="background:#ff5f57"></span>
+            <span class="bdot" style="background:#febc2e"></span>
+            <span class="bdot" style="background:#28c840"></span>
+          </div>
+          <div class="browser-url" id="preview-url">yoursite.com</div>
+        </div>
+        <div class="browser-body">
+          <div class="fake-nav" id="preview-nav">Your Company</div>
+          <div class="fake-hero"></div>
+          <div class="fake-lines">
+            <div class="fake-line"></div>
+            <div class="fake-line" style="width:60%"></div>
+            <div class="fake-line" style="width:80%"></div>
+          </div>
+          <div class="mini-widget">
+            <div class="mini-panel" id="mini-panel">
+              <div class="mini-head" id="mini-head" style="background:linear-gradient(135deg,#fb9c0f,#e06800)">
+                <div class="mini-logo">⬡</div>
+                <div>
+                  <div class="mini-name" id="mini-name">Your Company</div>
+                  <div class="mini-status">● Online now</div>
+                </div>
+              </div>
+              <div class="mini-body">
+                <div class="mini-msg">Hi! Ask me about pricing, repairs, or book a free estimate!</div>
+                <button class="mini-book" id="mini-book" style="background:linear-gradient(135deg,#fb9c0f,#e06800)">📅 Book Free Estimate →</button>
+              </div>
+            </div>
+            <button class="mini-bubble" id="mini-bubble" style="background:linear-gradient(135deg,#fb9c0f,#e06800)">⬡</button>
+          </div>
+        </div>
+      </div>
+      <div class="preview-caption">Live preview — updates as you type</div>
+    </div>
+    <div class="sidebar" id="sidebar"></div>
+  </div>
+</div>
+
+<script>
+const STEPS = ["Account","Business","Calendar","Install","Done"];
+let step = 0;
+let config = {name:"",email:"",password:"",company:"",phone:"",website:"",services:"asphalt and concrete paving",color:"#fb9c0f",calendly:""};
+
+const COLORS = ["#fb9c0f","#e53e3e","#38a169","#3182ce","#805ad5","#d69e2e"];
+
+function darken(hex){
+  try{const n=parseInt(hex.slice(1),16);const r=Math.max(0,(n>>16)-40);const g=Math.max(0,((n>>8)&0xff)-40);const b=Math.max(0,(n&0xff)-40);return`#${((r<<16)|(g<<8)|b).toString(16).padStart(6,"0")}`;}catch{return hex;}
+}
+function grad(c){return`linear-gradient(135deg,${c},${darken(c)})`;}
+
+function updatePreview(){
+  document.getElementById("preview-url").textContent=config.website||"yoursite.com";
+  document.getElementById("preview-nav").textContent=config.company||"Your Company";
+  document.getElementById("mini-name").textContent=config.company||"Your Company";
+  const g=grad(config.color||"#fb9c0f");
+  document.getElementById("mini-head").style.background=g;
+  document.getElementById("mini-book").style.background=g;
+  document.getElementById("mini-bubble").style.background=g;
+}
+
+function renderPills(){
+  const c=document.getElementById("pills");
+  c.innerHTML=STEPS.map((l,i)=>`<div class="pill ${i===step?"active":i<step?"done":""}">${i<step?"✓":i+1}</div>`).join("");
+}
+
+function renderSidebar(){
+  const c=document.getElementById("sidebar");
+  c.innerHTML=STEPS.map((l,i)=>{
+    const col=i===step?"#fb9c0f":i<step?"#888":"#444";
+    const bg=i<=step?"#fb9c0f":"#2a2a2a";
+    const border=i<step?"none":i===step?"2px solid #fb9c0f":"1px solid #333";
+    return`<div class="side-step"><div class="side-dot" style="background:${bg};border:${border};color:#fff">${i<step?"✓":""}</div><span style="color:${col}">${l}</span></div>`;
+  }).join("");
+}
+
+function setStep(n){step=n;renderPills();renderSidebar();renderStep();updatePreview();}
+function next(){setStep(Math.min(step+1,STEPS.length-1));}
+function back(){setStep(Math.max(step-1,0));}
+
+function embedCode(){
+  return `<!-- Pavement AI Widget -->
+<script>
+  window.PavementAI = {
+    company: "${config.company}",
+    color: "${config.color}",
+    calendly: "${config.calendly}",
+    services: "${config.services}"
+  };
+<\/script>
+<script src="https://cdn.pavementai.com/widget.js" async><\/script>`;
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(embedCode());
+  const btn=document.getElementById("copy-btn");
+  btn.textContent="✓ Copied!";
+  btn.style.background="#22c55e";
+  setTimeout(()=>{btn.textContent="Copy code";btn.style.background="#2a2a2a";},2500);
+}
+
+function renderStep(){
+  const c=document.getElementById("step-content");
+  if(step===0){
+    c.innerHTML=`<div class="card">
+      <div class="step-tag">STEP 1 OF 5</div>
+      <h2 class="card-title">Create your account</h2>
+      <p class="card-sub">Get started with a 14-day free trial. No credit card required.</p>
+      <div class="fields">
+        <div><label class="field-label">Full name</label><input class="field-input" id="f-name" placeholder="John Smith" value="${config.name}" oninput="config.name=this.value;checkNext0()"></div>
+        <div><label class="field-label">Email address</label><input class="field-input" id="f-email" type="email" placeholder="john@abcpaving.com" value="${config.email}" oninput="config.email=this.value;checkNext0()"></div>
+        <div><label class="field-label">Password</label><input class="field-input" id="f-pass" type="password" placeholder="Min. 8 characters" value="${config.password}" oninput="config.password=this.value;checkNext0()"></div>
+      </div>
+      <button class="btn-primary" id="next0" onclick="next()" ${config.name&&config.email&&config.password?"":"disabled"}>Create Account →</button>
+      <div class="legal">By continuing you agree to our Terms of Service and Privacy Policy.</div>
+    </div>`;
+  } else if(step===1){
+    c.innerHTML=`<div class="card">
+      <div class="step-tag">STEP 2 OF 5</div>
+      <h2 class="card-title">Tell us about your business</h2>
+      <p class="card-sub">This is how your AI assistant will introduce itself to customers.</p>
+      <div class="fields">
+        <div><label class="field-label">Company name</label><input class="field-input" id="f-co" placeholder="ABC Paving Co." value="${config.company}" oninput="config.company=this.value;updatePreview();checkNext1()"></div>
+        <div><label class="field-label">Phone number</label><input class="field-input" id="f-ph" placeholder="(555) 123-4567" value="${config.phone}" oninput="config.phone=this.value;checkNext1()"></div>
+        <div><label class="field-label">Website (optional)</label><input class="field-input" placeholder="https://abcpaving.com" value="${config.website}" oninput="config.website=this.value;updatePreview()"></div>
+        <div>
+          <label class="field-label">Services offered</label>
+          <select class="field-select" onchange="config.services=this.value">
+            <option value="asphalt and concrete paving" ${config.services==="asphalt and concrete paving"?"selected":""}>Asphalt & Concrete</option>
+            <option value="asphalt paving" ${config.services==="asphalt paving"?"selected":""}>Asphalt only</option>
+            <option value="concrete work" ${config.services==="concrete work"?"selected":""}>Concrete only</option>
+            <option value="asphalt, concrete, and seal coating">Asphalt, Concrete & Seal Coating</option>
+            <option value="commercial paving">Commercial Paving</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Widget accent color</label>
+          <div class="color-row">
+            ${COLORS.map(col=>`<button class="swatch ${config.color===col?"selected":""}" style="background:${col}" onclick="config.color='${col}';updatePreview();renderStep()"></button>`).join("")}
+            <input type="color" class="color-input" value="${config.color}" oninput="config.color=this.value;updatePreview()" title="Custom color"/>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="back()">← Back</button>
+        <button class="btn-primary" id="next1" onclick="next()" ${config.company&&config.phone?"":"disabled"}>Continue →</button>
+      </div>
+    </div>`;
+  } else if(step===2){
+    c.innerHTML=`<div class="card">
+      <div class="step-tag">STEP 3 OF 5</div>
+      <h2 class="card-title">Connect your calendar</h2>
+      <p class="card-sub">Customers will book free estimates directly on your real calendar — no back and forth.</p>
+      <div class="how-to">
+        <div class="how-to-title">How to get your Calendly link:</div>
+        <ol class="how-to-list">
+          <li>Go to <strong>calendly.com</strong> and create a free account</li>
+          <li>Click <strong>"+ New Event Type"</strong> → choose <strong>"One-on-One"</strong></li>
+          <li>Name it <strong>"Free Paving Estimate"</strong>, set duration to 30 min</li>
+          <li>Set your available hours and copy your booking link</li>
+          <li>Paste it below 👇</li>
+        </ol>
+      </div>
+      <div class="fields">
+        <div><label class="field-label">Your Calendly booking link</label><input class="field-input" placeholder="https://calendly.com/yourname/free-estimate" value="${config.calendly}" oninput="config.calendly=this.value"></div>
+      </div>
+      <div class="skip-note">Don't have Calendly yet? <button class="skip-btn" onclick="next()">Skip for now →</button></div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="back()">← Back</button>
+        <button class="btn-primary" onclick="next()">Continue →</button>
+      </div>
+    </div>`;
+  } else if(step===3){
+    c.innerHTML=`<div class="card">
+      <div class="step-tag">STEP 4 OF 5</div>
+      <h2 class="card-title">Add to your website</h2>
+      <p class="card-sub">Copy this snippet and paste it just before the <code style="background:#1e1e1e;padding:2px 6px;border-radius:4px;font-size:12px;color:#fb9c0f;font-family:monospace">&lt;/body&gt;</code> tag.</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">EMBED CODE</span>
+          <button class="copy-btn" id="copy-btn" style="background:#2a2a2a;color:#fff" onclick="copyCode()">Copy code</button>
+        </div>
+        <pre class="code-pre">${embedCode().replace(/</g,"&lt;").replace(/>/g,"&gt;")}</pre>
+      </div>
+      <div class="platform-grid">
+        <div class="platform-card"><span style="font-size:18px">🔵</span><div><div class="platform-name">WordPress</div><div class="platform-hint">Appearance → Theme Editor → footer.php</div></div></div>
+        <div class="platform-card"><span style="font-size:18px">⬜</span><div><div class="platform-name">Wix</div><div class="platform-hint">Settings → Custom Code → Body</div></div></div>
+        <div class="platform-card"><span style="font-size:18px">⬛</span><div><div class="platform-name">Squarespace</div><div class="platform-hint">Settings → Advanced → Code Injection</div></div></div>
+        <div class="platform-card"><span style="font-size:18px">🔷</span><div><div class="platform-name">Webflow</div><div class="platform-hint">Project Settings → Custom Code → Footer</div></div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="back()">← Back</button>
+        <button class="btn-primary" onclick="next()">I've added it →</button>
+      </div>
+    </div>`;
+  } else {
+    c.innerHTML=`<div class="card" style="text-align:center;padding:48px 40px">
+      <div class="success-icon">🎉</div>
+      <h2 class="card-title" style="font-size:28px;margin-bottom:12px">You're all set!</h2>
+      <p class="card-sub" style="max-width:360px;margin:0 auto 32px"><strong style="color:#fb9c0f">${config.company||"Your company"}</strong> is now powered by Pavement AI. Your widget is live and answering customers 24/7.</p>
+      <div class="summary-grid">
+        <div class="summary-item"><span style="font-size:18px">🤖</span><span>AI live on your site</span></div>
+        <div class="summary-item"><span style="font-size:18px">📅</span><span>${config.calendly?"Calendar connected":"Calendar: add later"}</span></div>
+        <div class="summary-item"><span style="font-size:18px">💬</span><span>24/7 lead capture</span></div>
+        <div class="summary-item"><span style="font-size:18px">🆓</span><span>14-day trial active</span></div>
+      </div>
+      <div class="trial-box">
+        <div class="trial-title">Your free trial ends in <strong style="color:#fb9c0f">14 days</strong></div>
+        <div class="trial-sub">Then just $149/month. Cancel anytime. No contracts.</div>
+        <button class="btn-primary" style="margin-top:16px" onclick="alert('Connect your Stripe account at stripe.com then paste your payment link here!')">Add Payment Method</button>
+      </div>
+    </div>`;
+  }
+}
+
+function checkNext0(){document.getElementById("next0").disabled=!(config.name&&config.email&&config.password);}
+function checkNext1(){document.getElementById("next1").disabled=!(config.company&&config.phone);}
+
+// Init
+setStep(0);
+</script>
+</body>
+</html>
