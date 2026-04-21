@@ -1,9 +1,10 @@
-{{ "source": "/dashboard", "destination": "/pavement-ai-dashboard.html" }
+
 
   "rewrites": [
     { "source": "/", "destination": "/pavement-ai-landing.html" },
     { "source": "/chatbot", "destination": "/pavement-ai-chatbot.html" },
     { "source": "/widget", "destination": "/pavement-ai-widget.html" },
     { "source": "/onboarding", "destination": "/pavement-ai-onboarding.html" }
-  ]
+  ]{ "source": "/dashboard", "destination": "/pavement-ai-dashboard.html" }
+
 }
