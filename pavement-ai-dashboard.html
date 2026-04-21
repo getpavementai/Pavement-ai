@@ -1,1 +1,457 @@
 { "source": "/dashboard", "destination": "/pavement-ai-dashboard.html" }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pavement AI — Lead Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --orange:#fb9c0f;--orange2:#e06800;--dark:#0b0b0b;--dark2:#111;--dark3:#181818;
+  --border:#1e1e1e;--border2:#252525;--text:#e8e8e8;--muted:#555;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);color:var(--text);font-family:'Sora',sans-serif;min-height:100vh}
+button{cursor:pointer;font-family:'Sora',sans-serif}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes countUp{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+/* ── Sidebar ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--dark2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:10}
+.sidebar-logo{padding:22px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.logo-box{width:32px;height:32px;background:linear-gradient(135deg,var(--orange),var(--orange2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:#fff}
+.nav{padding:16px 10px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-item{padding:10px 12px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--dark3);color:var(--text)}
+.nav-item.active{background:rgba(251,156,15,.1);color:var(--orange);border:1px solid rgba(251,156,15,.15)}
+.nav-icon{font-size:16px;width:20px;text-align:center}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border)}
+.contractor-card{background:var(--dark3);border:1px solid var(--border2);border-radius:10px;padding:12px}
+.contractor-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.contractor-plan{font-size:10px;color:var(--orange);display:flex;align-items:center;gap:4px}
+.plan-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green)}
+
+/* ── Main ── */
+.main{margin-left:220px;padding:28px 32px;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:#fff}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.notif-btn{width:36px;height:36px;border-radius:9px;background:var(--dark3);border:1px solid var(--border2);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:16px;position:relative}
+.notif-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--dark)}
+.date-badge{background:var(--dark3);border:1px solid var(--border2);border-radius:9px;padding:7px 14px;font-size:12px;color:var(--muted)}
+
+/* ── Stats grid ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-card{background:var(--dark2);border:1px solid var(--border);border-radius:14px;padding:20px;animation:fadeUp .4s ease both;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.orange::before{background:linear-gradient(90deg,var(--orange),var(--orange2))}
+.stat-card.green::before{background:linear-gradient(90deg,#22c55e,#16a34a)}
+.stat-card.blue::before{background:linear-gradient(90deg,#3b82f6,#2563eb)}
+.stat-card.purple::before{background:linear-gradient(90deg,#a855f7,#7c3aed)}
+.stat-label{font-size:10px;color:var(--muted);letter-spacing:1.5px;font-weight:600;margin-bottom:10px}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:1px;line-height:1;margin-bottom:6px}
+.stat-card.orange .stat-value{color:var(--orange)}
+.stat-card.green .stat-value{color:#22c55e}
+.stat-card.blue .stat-value{color:#3b82f6}
+.stat-card.purple .stat-value{color:#a855f7}
+.stat-change{font-size:11px;display:flex;align-items:center;gap:4px}
+.stat-change.up{color:#22c55e}
+.stat-change.neutral{color:var(--muted)}
+.stat-icon{position:absolute;bottom:12px;right:14px;font-size:28px;opacity:.15}
+
+/* ── Two col layout ── */
+.grid2{display:grid;grid-template-columns:1fr 360px;gap:16px;margin-bottom:16px}
+
+/* ── Leads table ── */
+.panel{background:var(--dark2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:13px;font-weight:600;color:var(--text)}
+.panel-sub{font-size:11px;color:var(--muted)}
+.filter-tabs{display:flex;gap:4px}
+.filter-tab{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .2s}
+.filter-tab.active{background:rgba(251,156,15,.1);color:var(--orange)}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:10px;color:var(--muted);letter-spacing:1.5px;font-weight:600;border-bottom:1px solid var(--border)}
+td{padding:13px 16px;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.03)}
+tr:hover td{background:rgba(255,255,255,.02)}
+tr:last-child td{border-bottom:none}
+.lead-name{font-weight:600;color:var(--text);margin-bottom:2px}
+.lead-phone{font-size:11px;color:var(--muted)}
+.badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.badge.booked{background:rgba(34,197,94,.1);color:#22c55e;border:1px solid rgba(34,197,94,.2)}
+.badge.chatting{background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.2)}
+.badge.new{background:rgba(251,156,15,.1);color:var(--orange);border:1px solid rgba(251,156,15,.2)}
+.badge.cold{background:rgba(100,100,100,.1);color:#666;border:1px solid rgba(100,100,100,.2)}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.view-btn{background:var(--dark3);border:1px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);transition:all .2s}
+.view-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ── Activity feed ── */
+.activity{display:flex;flex-direction:column;gap:0}
+.activity-item{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:flex-start;animation:fadeUp .3s ease both}
+.activity-item:last-child{border-bottom:none}
+.a-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
+.a-icon.lead{background:rgba(251,156,15,.12);border:1px solid rgba(251,156,15,.2)}
+.a-icon.book{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.2)}
+.a-icon.chat{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2)}
+.a-title{font-size:12.5px;color:var(--text);font-weight:500;margin-bottom:3px;line-height:1.4}
+.a-time{font-size:10.5px;color:var(--muted)}
+
+/* ── Notification settings panel ── */
+.notif-panel{background:var(--dark2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px}
+.toggle-row{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info{flex:1}
+.toggle-label{font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px}
+.toggle-desc{font-size:11px;color:var(--muted)}
+.toggle{width:40px;height:22px;border-radius:11px;position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--orange)}
+.toggle.off{background:var(--border2)}
+.toggle-thumb{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle.on .toggle-thumb{left:21px}
+.toggle.off .toggle-thumb{left:3px}
+
+/* ── Notification preview ── */
+.notif-preview{background:var(--dark3);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin:0 20px 20px}
+.notif-preview-label{font-size:9px;letter-spacing:2px;color:var(--muted);font-weight:600;margin-bottom:10px}
+.phone-notif{background:#1c1c1e;border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.notif-app-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--orange),var(--orange2));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.notif-app-name{font-size:10px;color:#888;margin-bottom:2px}
+.notif-text{font-size:12px;color:#e0e0e0;line-height:1.5}
+.notif-time{font-size:10px;color:#666;margin-top:3px}
+
+/* ── Chart ── */
+.chart-wrap{padding:16px 20px 20px}
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-bottom:6px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;background:var(--border2);transition:height .5s ease}
+.bar.active{background:linear-gradient(180deg,var(--orange),var(--orange2))}
+.bar-label{font-size:9px;color:var(--muted)}
+.chart-labels{display:flex;justify-content:space-between;padding:0 2px}
+.chart-label{font-size:9px;color:var(--muted);flex:1;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-box">⬡</div>
+    <span class="logo-text">PAVEMENT AI</span>
+  </div>
+  <div class="nav">
+    <button class="nav-item active"><span class="nav-icon">📊</span>Dashboard</button>
+    <button class="nav-item"><span class="nav-icon">💬</span>All Leads</button>
+    <button class="nav-item"><span class="nav-icon">📅</span>Bookings</button>
+    <button class="nav-item"><span class="nav-icon">🔔</span>Notifications</button>
+    <button class="nav-item"><span class="nav-icon">⚙️</span>Settings</button>
+    <button class="nav-item"><span class="nav-icon">🔗</span>Install Widget</button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="contractor-card">
+      <div class="contractor-name">ABC Paving Co.</div>
+      <div class="contractor-plan"><span class="plan-dot"></span>Pro Plan · Active</div>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Lead Dashboard</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">Welcome back — here's what's been happening on your site</div>
+    </div>
+    <div class="topbar-right">
+      <div class="notif-btn">🔔<span class="notif-badge">3</span></div>
+      <div class="date-badge">April 2026</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card orange" style="animation-delay:.05s">
+      <div class="stat-label">TOTAL LEADS</div>
+      <div class="stat-value" id="s1">0</div>
+      <div class="stat-change up">↑ 12 from last month</div>
+      <div class="stat-icon">👥</div>
+    </div>
+    <div class="stat-card green" style="animation-delay:.1s">
+      <div class="stat-label">ESTIMATES BOOKED</div>
+      <div class="stat-value" id="s2">0</div>
+      <div class="stat-change up">↑ 4 from last month</div>
+      <div class="stat-icon">📅</div>
+    </div>
+    <div class="stat-card blue" style="animation-delay:.15s">
+      <div class="stat-label">AFTER HOURS LEADS</div>
+      <div class="stat-value" id="s3">0</div>
+      <div class="stat-change up">↑ Would've been missed</div>
+      <div class="stat-icon">🌙</div>
+    </div>
+    <div class="stat-card purple" style="animation-delay:.2s">
+      <div class="stat-label">EST. REVENUE SAVED</div>
+      <div class="stat-value" id="s4">$0</div>
+      <div class="stat-change neutral">Based on avg job value</div>
+      <div class="stat-icon">💰</div>
+    </div>
+  </div>
+
+  <!-- Main grid -->
+  <div class="grid2">
+
+    <!-- Leads table -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Recent Leads</div>
+          <div class="panel-sub">Everyone who chatted with your AI this month</div>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="filterLeads('all',this)">All</button>
+          <button class="filter-tab" onclick="filterLeads('booked',this)">Booked</button>
+          <button class="filter-tab" onclick="filterLeads('new',this)">New</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>LEAD</th>
+            <th>INTEREST</th>
+            <th>TIME</th>
+            <th>STATUS</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="leads-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Activity feed -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Live Activity</div>
+          <div class="panel-sub">Real-time widget events</div>
+        </div>
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite"></div>
+      </div>
+      <div class="activity" id="activity"></div>
+    </div>
+  </div>
+
+  <!-- Bottom row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <!-- Weekly chart -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Leads This Week</div>
+          <div class="panel-sub">Daily breakdown</div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-bars" id="chart-bars"></div>
+        <div class="chart-labels" id="chart-labels"></div>
+      </div>
+    </div>
+
+    <!-- Notification settings -->
+    <div>
+      <div class="panel notif-panel" style="margin-bottom:14px">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🔔 Notification Settings</div>
+            <div class="panel-sub">Get alerted the moment a lead comes in</div>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">New lead — text me</div>
+            <div class="toggle-desc">Instant SMS when someone starts chatting</div>
+          </div>
+          <button class="toggle on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Estimate booked — text me</div>
+            <div class="toggle-desc">SMS when a customer books via Calendly</div>
+          </div>
+          <button class="toggle on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Daily summary email</div>
+            <div class="toggle-desc">Morning digest of previous day's activity</div>
+          </div>
+          <button class="toggle on" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">After-hours alert only</div>
+            <div class="toggle-desc">Only notify outside 8am–6pm</div>
+          </div>
+          <button class="toggle off" onclick="toggleSwitch(this)"><div class="toggle-thumb"></div></button>
+        </div>
+      </div>
+
+      <!-- Phone notification preview -->
+      <div class="panel" style="padding:16px 20px">
+        <div style="font-size:10px;letter-spacing:2px;color:var(--muted);font-weight:600;margin-bottom:12px">WHAT YOU'LL RECEIVE</div>
+        <div class="phone-notif">
+          <div class="notif-app-icon">⬡</div>
+          <div>
+            <div class="notif-app-name">Pavement AI · now</div>
+            <div class="notif-text">🔥 New lead on your site! Mike Johnson asked about driveway pricing and booked a free estimate for Thursday 10am.</div>
+            <div class="notif-time">Slide to reply</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Sample data ──
+const LEADS = [
+  {name:"Mike Johnson",phone:"(555) 204-1832",interest:"New asphalt driveway",time:"Today, 11:42pm",status:"booked"},
+  {name:"Sarah Chen",phone:"(555) 891-4401",interest:"Parking lot seal coat",time:"Today, 9:15pm",status:"booked"},
+  {name:"David Williams",phone:"(555) 334-7720",interest:"Crack repair — 3 spots",time:"Today, 6:03pm",status:"new"},
+  {name:"Karen Patel",phone:"(555) 772-0093",interest:"Concrete driveway quote",time:"Yesterday, 8:47pm",status:"chatting"},
+  {name:"Tom Richards",phone:"(555) 445-2281",interest:"Asphalt vs concrete?",time:"Yesterday, 7:30pm",status:"booked"},
+  {name:"Lisa Monroe",phone:"(555) 663-9910",interest:"Commercial parking lot",time:"Apr 13, 2:12pm",status:"chatting"},
+  {name:"James Park",phone:"(555) 118-5543",interest:"Pothole repair",time:"Apr 12, 11:05am",status:"cold"},
+  {name:"Amanda Foster",phone:"(555) 990-4477",interest:"Stamped concrete patio",time:"Apr 11, 9:20pm",status:"booked"},
+];
+
+const ACTIVITY = [
+  {icon:"📅",type:"book",title:"Mike Johnson booked a free estimate for Thursday 10am",time:"2 minutes ago"},
+  {icon:"💬",type:"chat",title:"New visitor asking about driveway pricing — converted to lead",time:"14 minutes ago"},
+  {icon:"📅",type:"book",title:"Sarah Chen booked a parking lot assessment",time:"1 hour ago"},
+  {icon:"🔥",type:"lead",title:"After-hours lead captured: Karen Patel — concrete driveway",time:"3 hours ago"},
+  {icon:"💬",type:"chat",title:"David Williams asked about crack repair — contact info captured",time:"5 hours ago"},
+  {icon:"📅",type:"book",title:"Tom Richards booked a free estimate",time:"Yesterday 8:50pm"},
+];
+
+const CHART_DATA = [
+  {day:"Mon",val:3},{day:"Tue",val:5},{day:"Wed",val:2},{day:"Thu",val:7},{day:"Fri",val:4},{day:"Sat",val:8},{day:"Sun",val:6},
+];
+
+const STATUS_LABELS = {booked:"Booked",chatting:"Active",new:"New",cold:"No reply"};
+const STATUS_CLASSES = {booked:"booked",chatting:"chatting",new:"new",cold:"cold"};
+
+let currentFilter = "all";
+
+// ── Render leads ──
+function renderLeads(){
+  const body = document.getElementById("leads-body");
+  const filtered = currentFilter === "all" ? LEADS : LEADS.filter(l => l.status === currentFilter);
+  body.innerHTML = filtered.map(l => `
+    <tr>
+      <td><div class="lead-name">${l.name}</div><div class="lead-phone">${l.phone}</div></td>
+      <td style="color:#aaa;font-size:12px;max-width:160px">${l.interest}</td>
+      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${l.time}</td>
+      <td><span class="badge ${STATUS_CLASSES[l.status]}"><span class="badge-dot"></span>${STATUS_LABELS[l.status]}</span></td>
+      <td><button class="view-btn">View →</button></td>
+    </tr>
+  `).join("");
+}
+
+function filterLeads(f, btn){
+  currentFilter = f;
+  document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  renderLeads();
+}
+
+// ── Render activity ──
+function renderActivity(){
+  const el = document.getElementById("activity");
+  el.innerHTML = ACTIVITY.map((a,i) => `
+    <div class="activity-item" style="animation-delay:${i*0.05}s">
+      <div class="a-icon ${a.type}">${a.icon}</div>
+      <div>
+        <div class="a-title">${a.title}</div>
+        <div class="a-time">${a.time}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+// ── Render chart ──
+function renderChart(){
+  const maxVal = Math.max(...CHART_DATA.map(d=>d.val));
+  const bars = document.getElementById("chart-bars");
+  const labels = document.getElementById("chart-labels");
+  const today = new Date().getDay();
+  const dayIdx = today === 0 ? 6 : today - 1;
+  bars.innerHTML = CHART_DATA.map((d,i) => `
+    <div class="bar-col">
+      <div style="font-size:9px;color:${i===dayIdx?'var(--orange)':'var(--muted)'};margin-bottom:3px">${d.val}</div>
+      <div class="bar ${i===dayIdx?'active':''}" style="height:${Math.round((d.val/maxVal)*70)+10}px"></div>
+    </div>
+  `).join("");
+  labels.innerHTML = CHART_DATA.map((d,i) => `
+    <span class="chart-label" style="color:${i===dayIdx?'var(--orange)':'var(--muted)'}">${d.day}</span>
+  `).join("");
+}
+
+// ── Animate stats ──
+function animateStat(id, target, prefix="", suffix=""){
+  const el = document.getElementById(id);
+  let current = 0;
+  const step = Math.ceil(target / 30);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = prefix + current.toLocaleString() + suffix;
+    if(current >= target) clearInterval(timer);
+  }, 40);
+}
+
+// ── Toggle ──
+function toggleSwitch(btn){
+  const isOn = btn.classList.contains("on");
+  btn.classList.toggle("on", !isOn);
+  btn.classList.toggle("off", isOn);
+}
+
+// ── Simulate live activity ──
+function simulateLiveActivity(){
+  const newItems = [
+    {icon:"🔥",type:"lead",title:"New visitor on your site right now — asking about seal coating",time:"Just now"},
+    {icon:"💬",type:"chat",title:"Anonymous visitor asked about driveway pricing",time:"Just now"},
+    {icon:"📅",type:"book",title:"New estimate request received — pending confirmation",time:"Just now"},
+  ];
+  let i = 0;
+  setInterval(() => {
+    const item = newItems[i % newItems.length];
+    const activity = document.getElementById("activity");
+    const div = document.createElement("div");
+    div.className = `activity-item ${item.type}`;
+    div.innerHTML = `<div class="a-icon ${item.type}">${item.icon}</div><div><div class="a-title">${item.title}</div><div class="a-time">${item.time}</div></div>`;
+    div.style.animation = "fadeUp .3s ease";
+    div.style.background = "rgba(251,156,15,.04)";
+    activity.insertBefore(div, activity.firstChild);
+    if(activity.children.length > 8) activity.removeChild(activity.lastChild);
+    setTimeout(() => div.style.background = "", 2000);
+    i++;
+  }, 12000);
+}
+
+// ── Init ──
+renderLeads();
+renderActivity();
+renderChart();
+setTimeout(() => {
+  animateStat("s1", 47);
+  animateStat("s2", 18);
+  animateStat("s3", 31);
+  animateStat("s4", 12400, "$");
+}, 300);
+simulateLiveActivity();
+</script>
+</body>
+</html>
